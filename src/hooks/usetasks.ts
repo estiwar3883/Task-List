@@ -2,84 +2,150 @@
 
 import { useEffect, useState } from "react";
 import type { Task } from "../types/task";
-import { useLocalStorage } from "./uselocarstorage";
-
-
 
 export const useTasks = () => {
+
     const [Input, setInput] = useState("");
-    const [List, setList] = useLocalStorage<Task[]>(
-        "tasks",
-        []
-    );
-    // TIMER
+    const [List, setList] = useState<Task[]>([]);
+
+    // REFRESH TIMER UI
+    const [, forceUpdate] = useState(0);
+
     useEffect(() => {
-        const activeTask = List.find(
-            (task) => task.state === "inProgress"
-        );
-        if (activeTask) {
-            const interval = setInterval(() => {
-                setList((tasks) =>
-                    tasks.map((task) => {
+        const interval = setInterval(() => {
+            forceUpdate((prev) => prev + 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
 
-                        if (task.id !== activeTask.id) {
-                            return task;
-                        }
-
-                        return {
-                            ...task,
-                            time: task.time + 1,
-                        };
-                    })
-                );
-
-            }, 1000);
-            return () => clearInterval(interval);
-        }
-    }, [List, setList]);
-    // ADD TASK
-    const addTask = () => {
-        if (!Input.trim()) return;
-        const task: Task = {
-            id: crypto.randomUUID(),
-            title: Input.trim(),
-            date: "",
-            time: 0,
-            state: "pending",
+    // GET TASKS FROM MONGODB
+    useEffect(() => {
+        const getTasks = async () => {
+            try {
+                const response = await fetch("/api/tasks");
+                const data = await response.json();
+                setList(data);
+            } catch (error) {
+                console.log(error);
+            }
         };
-        setList([...List, task]);
+        getTasks();
 
-        setInput("");
+    }, []);
+
+    // GET CURRENT TIME
+    const getCurrentTime = (task: Task) => {
+        if (
+            task.state !== "inProgress" ||
+            !task.startedAt
+        ) {
+            return task.totalTime;
+        }
+        return (
+            task.totalTime +
+            Math.floor(
+                (Date.now() - task.startedAt) / 1000
+            )
+        );
+    };
+
+    // ADD TASK
+    const addTask = async () => {
+        if (!Input.trim()) return;
+        try {
+
+            const response = await fetch("/api/tasks", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title: Input.trim(),
+                    state: "pending",
+                    totalTime: 0,
+                    startedAt: null,
+                    date: "",
+                }),
+            });
+
+            const newTask = await response.json();
+            setList((prev) => [...prev, newTask]);
+            setInput("");
+        } catch (error) {
+            console.log(error);
+
+        }
     };
 
     // CHANGE TASK STATE
-    const changeTaskState = (id: string) => {
-        setList((tasks) =>
-            
-            tasks.filter(
-                (task) => !(task.id === id && task.state === "Done")
-            )
-            .map((task) => {
-                if (task.id !== id) {
-                    return task;
-                }
-                if (task.state === "pending") {
-                    return {
-                        ...task,
-                        state: "inProgress" as const,
-                        date: new Date().toLocaleString(),
-                    };
-                }
-                if (task.state === "inProgress") {
-                    return {
-                        ...task,
-                        state: "Done" as const,
-                        date: new Date().toLocaleString(),
-                    };
-                }
-                return task;
-            })
-        );
+    const changeTaskState = async (id: string) => {
+        try {
+            const task = List.find(
+                (task) => task._id === id
+            );
+            if (!task) return;
+            let updatedTask: Task;
+
+            // START TASK
+            if (task.state === "pending") {
+                updatedTask = {
+                    ...task,
+                    state: "inProgress",
+                    startedAt: Date.now(),
+                    date: new Date().toLocaleString(),
+                };
+            }
+
+            // FINISH TASK
+            else if (task.state === "inProgress") {
+                const extraTime =
+                    Math.floor(
+                        (Date.now() - task.startedAt!) / 1000
+                    );
+                updatedTask = {
+                    ...task,
+                    state: "done",
+                    totalTime:
+                        task.totalTime + extraTime,
+                    startedAt: null,
+                    date: new Date().toLocaleString(),
+                };
+            }
+
+            // DELETE TASK IF DONE
+            else {
+                await fetch(`/api/tasks/${id}`, {
+                    method: "DELETE",
+                });
+                setList((tasks) =>
+                    tasks.filter(
+                        (task) => task._id !== id
+                    )
+                );
+                return;
+            }
+
+            // UPDATE DATABASE
+            await fetch(`/api/tasks/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedTask),
+            });
+
+            // UPDATE UI
+            setList((tasks) =>
+                tasks.map((task) =>
+                    task._id === id
+                        ? updatedTask
+                        : task
+                )
+            );
+
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     return {
@@ -88,5 +154,6 @@ export const useTasks = () => {
         List,
         addTask,
         changeTaskState,
+        getCurrentTime,
     };
 };

@@ -4,7 +4,7 @@ export const stateText = {
   Done: "Done",
 };
 
-export const buttonText = {
+export const buttonText =  {
   pending: "Start",
   inProgress: "Finish",
   Done: "Delete",

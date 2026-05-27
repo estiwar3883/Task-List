@@ -1,7 +1,8 @@
 export interface Task {
-  id: string;
+  _id: string;
   title: string;
   date: string;
-  time: number;
-  state: "pending" | "inProgress" | "Done";
+  startedAt: number | null;
+  totalTime: number;
+  state: "pending" | "inProgress" | "done";
 }

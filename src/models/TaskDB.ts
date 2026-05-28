@@ -6,9 +6,25 @@ const TaskSchema = new Schema({
     required: true,
   },
 
-  completed: {
-    type: Boolean,
-    default: false,
+  date: {
+    type: String,
+    default: "",
+  },
+
+  startedAt: {
+    type: Number,
+    default: null,
+  },
+
+  totalTime: {
+    type: Number,
+    default: 0,
+  },
+
+  state: {
+    type: String,
+    enum: ["pending", "inProgress", "done"],
+    default: "pending",
   },
 });
 

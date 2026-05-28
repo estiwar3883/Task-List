@@ -87,7 +87,7 @@ export default function Home() {
                     state={task.state}
                     date={task.date}
                     time={getCurrentTime(task)}
-                    id={task._id}
+                    _id={task._id}
                     handleStartButton={changeTaskState}
                   />
                 );

@@ -161,7 +161,7 @@ button:active {
   border-left-color: #2f6fed;
 }
 
-.card2.Done {
+.card2.done {
   border-left-color: #33a37c;
 }
 
@@ -206,7 +206,7 @@ button:active {
   border-color: #93c5fd;
 }
 
-.card2.Done .card-status {
+.card2.done .card-status {
   color: #166534;
   background: #dcfce7;
   border-color: #86efac;
@@ -232,11 +232,11 @@ button:active {
   white-space: nowrap;
 }
 
-.card2.Done .card-action {
+.card2.done .card-action {
   background: #bd3b31;
 }
 
-.card2.Done .card-action:hover {
+.card2.done .card-action:hover {
   background: #9f2f24;
   box-shadow: 0 10px 24px rgba(192, 57, 43, 0.24);
 }

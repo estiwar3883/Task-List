@@ -3,6 +3,6 @@ export interface CardProps {
   date: string;
   state: "pending" | "inProgress" | "done"
   time: number;
-  id: string;
-  handleStartButton: (id: string)=> void
+  _id: string;
+  handleStartButton: (_id: string)=> void
 }

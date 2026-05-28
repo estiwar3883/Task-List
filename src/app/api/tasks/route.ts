@@ -6,8 +6,16 @@ import { Task } from "@/models/TaskDB";
 export async function GET() {
   await connectBD();
 
-  const tasks = await Task.find();
-  return NextResponse.json(tasks);
+  const tasks = await Task.find().lean();
+  const normalizedTasks = tasks.map((task) => ({
+    ...task,
+    state: task.state ?? "pending",
+    totalTime: task.totalTime ?? 0,
+    startedAt: task.startedAt ?? null,
+    date: task.date ?? "",
+  }));
+
+  return NextResponse.json(normalizedTasks);
 }
 
 // CREATE TASK
@@ -18,10 +26,10 @@ export async function POST(req: Request) {
 
   const newTask = await Task.create({
     title: body.title,
-    state: body.state,
-    totalTime: body.totalTime,
-    startedAt: body.startedAt,
-    date: body.date,
+    state: body.state ?? "pending",
+    totalTime: body.totalTime ?? 0,
+    startedAt: body.startedAt ?? null,
+    date: body.date ?? "",
   });
 
   return NextResponse.json(newTask);

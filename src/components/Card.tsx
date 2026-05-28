@@ -8,7 +8,7 @@ export const Card = ({
     date,
     state,
     time,
-    id,
+    _id,
     handleStartButton
 }: CardProps) => {
     const formatTime = (
@@ -51,7 +51,7 @@ export const Card = ({
             </div>
             <button
                 className="card-action"
-                onClick={() => handleStartButton(id)}
+                onClick={() => handleStartButton(_id)}
             >
                 {buttonText[state]}
             </button>

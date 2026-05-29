@@ -12,6 +12,7 @@ export default function Home() {
     List,
     addTask,
     changeTaskState,
+    editTaskTitle,
     getCurrentTime,
   } = useTasks();
 
@@ -89,6 +90,7 @@ export default function Home() {
                     time={getCurrentTime(task)}
                     _id={task._id}
                     handleStartButton={changeTaskState}
+                    handleEditTitle={editTaskTitle}
                   />
                 );
 

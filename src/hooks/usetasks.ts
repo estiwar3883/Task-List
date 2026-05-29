@@ -148,12 +148,46 @@ export const useTasks = () => {
         }
     };
 
+    // EDIT TASK TITLE
+    const editTaskTitle = async (id: string, title: string) => {
+        const cleanTitle = title.trim();
+        if (!cleanTitle) return;
+
+        try {
+            const response = await fetch(`/api/tasks/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title: cleanTitle,
+                }),
+            });
+
+            const updatedTask = await response.json();
+
+            setList((tasks) =>
+                tasks.map((task) =>
+                    task._id === id
+                        ? {
+                            ...task,
+                            title: updatedTask.title ?? cleanTitle,
+                        }
+                        : task
+                )
+            );
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return {
         Input,
         setInput,
         List,
         addTask,
         changeTaskState,
+        editTaskTitle,
         getCurrentTime,
     };
 };

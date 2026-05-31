@@ -48,6 +48,12 @@ button:active {
   transform: translateY(0);
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
 .task-page {
   width: 100%;
   min-height: 100dvh;
@@ -61,6 +67,7 @@ button:active {
 .task-shell {
   width: min(100%, 960px);
   margin: 0 auto;
+  position: relative;
 }
 
 .task-header {
@@ -85,6 +92,86 @@ button:active {
   font-size: clamp(2rem, 4vw, 3.8rem);
   font-weight: 850;
   line-height: 1;
+}
+
+.task-session-bar {
+  max-width: min(100%, 320px);
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 0;
+  color: #526177;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.task-session-bar span {
+  min-width: 0;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-secondary-button {
+  min-height: 38px;
+  padding: 0 14px;
+  color: #2357c6;
+  background: #e8f0ff;
+  border: 1px solid #c6d8ff;
+  box-shadow: none;
+}
+
+.task-secondary-button:hover {
+  color: #ffffff;
+  background: #2357c6;
+  box-shadow: 0 8px 18px rgba(35, 87, 198, 0.18);
+}
+
+.auth-panel {
+  width: min(100%, 440px);
+  display: grid;
+  gap: 12px;
+  margin: 0 auto;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.93);
+  border: 1px solid rgba(190, 202, 220, 0.85);
+  border-radius: 8px;
+  box-shadow: 0 18px 46px rgba(27, 39, 64, 0.1);
+}
+
+.auth-panel input {
+  width: 100%;
+  min-height: 46px;
+  min-width: 0;
+  padding: 0 14px;
+  color: #172033;
+  background: #ffffff;
+  border: 1px solid #cdd7e5;
+  border-radius: 8px;
+  outline: none;
+}
+
+.auth-panel input:focus {
+  border-color: #2f6fed;
+  box-shadow: 0 0 0 4px rgba(47, 111, 237, 0.16);
+}
+
+.auth-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.auth-error {
+  margin: 0;
+  color: #9f2f24;
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
 .task-input-bar {
@@ -308,6 +395,22 @@ button:active {
 
   .task-header {
     text-align: left;
+  }
+
+  .task-session-bar {
+    max-width: 100%;
+    position: static;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+    order: -1;
+  }
+
+  .task-session-bar .task-secondary-button {
+    width: auto;
+  }
+
+  .auth-actions {
+    grid-template-columns: 1fr;
   }
 
   .task-input-bar {

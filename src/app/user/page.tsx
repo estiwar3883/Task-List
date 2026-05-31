@@ -16,7 +16,11 @@ const User = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    const frameId = requestAnimationFrame(() => {
+      fetchData();
+    });
+
+    return () => cancelAnimationFrame(frameId);
   }, []);
 
   return (

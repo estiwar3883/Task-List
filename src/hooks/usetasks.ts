@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Task } from "../types/task";
 
-export const useTasks = () => {
+export const useTasks = (enabled = true) => {
 
     const [Input, setInput] = useState("");
     const [List, setList] = useState<Task[]>([]);
@@ -19,39 +19,38 @@ export const useTasks = () => {
     }, []);
 
     // GET TASKS FROM MONGODB
-    useEffect(() => {
-        const getTasks = async () => {
-            try {
-                const response = await fetch("/api/tasks");
-                const data = await response.json();
-                setList(data);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        getTasks();
-
-    }, []);
-
-    // GET CURRENT TIME
-    const getCurrentTime = (task: Task) => {
-        if (
-            task.state !== "inProgress" ||
-            !task.startedAt
-        ) {
-            return task.totalTime;
+    const getTasks = useCallback(async () => {
+        if (!enabled) {
+            setList([]);
+            return;
         }
-        return (
-            task.totalTime +
-            Math.floor(
-                (Date.now() - task.startedAt) / 1000
-            )
-        );
-    };
+
+        try {
+            const response = await fetch("/api/tasks");
+
+            if (!response.ok) {
+                setList([]);
+                return;
+            }
+
+            const data = await response.json();
+            setList(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }, [enabled]);
+
+    useEffect(() => {
+        const frameId = requestAnimationFrame(() => {
+            getTasks();
+        });
+
+        return () => cancelAnimationFrame(frameId);
+    }, [getTasks]);
 
     // ADD TASK
     const addTask = async () => {
-        if (!Input.trim()) return;
+        if (!Input.trim() || !enabled) return;
         try {
 
             const response = await fetch("/api/tasks", {
@@ -68,6 +67,10 @@ export const useTasks = () => {
                 }),
             });
 
+            if (!response.ok) {
+                return;
+            }
+
             const newTask = await response.json();
             setList((prev) => [...prev, newTask]);
             setInput("");
@@ -75,6 +78,22 @@ export const useTasks = () => {
             console.log(error);
 
         }
+    };
+
+    // GET CURRENT TIME
+    const getCurrentTime = (task: Task) => {
+        if (
+            task.state !== "inProgress" ||
+            !task.startedAt
+        ) {
+            return task.totalTime;
+        }
+        return (
+            task.totalTime +
+            Math.floor(
+                (Date.now() - task.startedAt) / 1000
+            )
+        );
     };
 
     // CHANGE TASK STATE
@@ -114,9 +133,14 @@ export const useTasks = () => {
 
             // DELETE TASK IF DONE
             else {
-                await fetch(`/api/tasks/${id}`, {
+                const response = await fetch(`/api/tasks/${id}`, {
                     method: "DELETE",
                 });
+
+                if (!response.ok) {
+                    return;
+                }
+
                 setList((tasks) =>
                     tasks.filter(
                         (task) => task._id !== id
@@ -126,7 +150,7 @@ export const useTasks = () => {
             }
 
             // UPDATE DATABASE
-            await fetch(`/api/tasks/${id}`, {
+            const response = await fetch(`/api/tasks/${id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -134,11 +158,17 @@ export const useTasks = () => {
                 body: JSON.stringify(updatedTask),
             });
 
+            if (!response.ok) {
+                return;
+            }
+
+            const savedTask = await response.json();
+
             // UPDATE UI
             setList((tasks) =>
                 tasks.map((task) =>
                     task._id === id
-                        ? updatedTask
+                        ? savedTask
                         : task
                 )
             );
@@ -163,6 +193,10 @@ export const useTasks = () => {
                     title: cleanTitle,
                 }),
             });
+
+            if (!response.ok) {
+                return;
+            }
 
             const updatedTask = await response.json();
 

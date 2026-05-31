@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Card } from "@/components/Card";
 import { useTasks } from "@/hooks/usetasks";
@@ -23,6 +24,10 @@ export default function Home() {
     editTaskTitle,
     getCurrentTime,
   } = useTasks(isAuthenticated);
+
+  const pendingTasks = List.filter((task) => task.state === "pending").length;
+  const activeTasks = List.filter((task) => task.state === "inProgress").length;
+  const doneTasks = List.filter((task) => task.state === "done").length;
 
   const [isMounted, setIsMounted] = useState(false);
 
@@ -85,12 +90,14 @@ export default function Home() {
 
       <section className="task-shell" aria-labelledby="task-title">
         <header className="task-header">
-          <p className="task-eyebrow">
-            Daily organizer
-          </p>
-          <h1 id="task-title">
-            Task List
-          </h1>
+          <div className="task-title-block">
+            <p className="task-eyebrow">
+              Daily organizer
+            </p>
+            <h1 id="task-title">
+              Task List
+            </h1>
+          </div>
 
           {isAuthenticated && (
             <div className="task-session-bar">
@@ -119,9 +126,17 @@ export default function Home() {
             className="auth-panel"
             aria-label="Authentication"
           >
+            <div className="auth-mark" aria-hidden="true">
+              <Image
+                src="/icon.svg"
+                alt=""
+                width={68}
+                height={68}
+              />
+            </div>
             <input
               aria-label="Name"
-              placeholder="Name"
+              placeholder="Nombre"
               value={authName}
               onChange={(event) => {
                 setAuthName(event.target.value);
@@ -129,7 +144,7 @@ export default function Home() {
             />
             <input
               aria-label="Email"
-              placeholder="Email"
+              placeholder="Correo"
               type="email"
               value={authEmail}
               onChange={(event) => {
@@ -138,7 +153,7 @@ export default function Home() {
             />
             <input
               aria-label="Password"
-              placeholder="Password"
+              placeholder="Contrasena"
               type="password"
               value={authPassword}
               onChange={(event) => {
@@ -179,10 +194,29 @@ export default function Home() {
 
         {isAuthenticated && (
           <>
+            <section className="task-summary" aria-label="Task summary">
+              <div className="task-summary-item">
+                <span>Total</span>
+                <strong>{List.length}</strong>
+              </div>
+              <div className="task-summary-item is-pending">
+                <span>Pendientes</span>
+                <strong>{pendingTasks}</strong>
+              </div>
+              <div className="task-summary-item is-active">
+                <span>Activas</span>
+                <strong>{activeTasks}</strong>
+              </div>
+              <div className="task-summary-item is-done">
+                <span>Listas</span>
+                <strong>{doneTasks}</strong>
+              </div>
+            </section>
+
             <div className="task-input-bar">
               <input
                 aria-label="New task"
-                placeholder="Write a task..."
+                placeholder="Nueva tarea..."
                 value={Input}
                 onChange={(event) => {
                   setInput(event.target.value);
@@ -199,7 +233,7 @@ export default function Home() {
                 className="task-add-button"
                 onClick={addTask}
               >
-                Add Task
+                Agregar
               </button>
 
             </div>
@@ -214,7 +248,7 @@ export default function Home() {
 
                   {List.length === 0 && (
                     <p className="task-empty">
-                      No tasks yet. Create one to get started.
+                      Todavia no tienes tareas.
                     </p>
                   )}
 

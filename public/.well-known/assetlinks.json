@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.estiwar.tasklist",
+      "sha256_cert_fingerprints": [
+        "D2:D5:24:59:1A:87:61:83:01:DF:20:C5:01:24:A6:45:D2:5B:44:A2:BE:93:9D:97:8E:79:06:5A:97:B9:E1:F1"
+      ]
+    }
+  }
+]

@@ -27,6 +27,42 @@ const unauthorizedResponse = () => {
   );
 };
 
+// GET SINGLE TASK
+export async function GET(_req: Request, { params }: TaskRouteContext) {
+  const userId = await getUserId();
+
+  if (!userId) {
+    return unauthorizedResponse();
+  }
+
+  await connectBD();
+
+  const { id } = await params;
+  const task = await Task.findOne({ _id: id, userId }).lean();
+
+  if (!task) {
+    return NextResponse.json(
+      {
+        message: "Task not found",
+      },
+      {
+        status: 404,
+      }
+    );
+  }
+
+  const normalizedTask = {
+    ...task,
+    state: task.state ?? "pending",
+    totalTime: task.totalTime ?? 0,
+    startedAt: task.startedAt ?? null,
+    date: task.date ?? "",
+    comments: task.comments ?? [],
+  };
+
+  return NextResponse.json(normalizedTask);
+}
+
 // UPDATE TASK
 export async function PATCH(req: Request, { params }: TaskRouteContext) {
   const userId = await getUserId();

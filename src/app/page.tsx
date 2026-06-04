@@ -1,9 +1,17 @@
 "use client";
 
+import {
+  Button,
+  Card as HeroCard,
+  Chip,
+  Input as HeroInput,
+  Spinner,
+} from "@heroui/react";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Card } from "@/components/Card";
+import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { useTasks } from "@/hooks/usetasks";
 
 export default function Home() {
@@ -91,38 +99,44 @@ export default function Home() {
       <section className="task-shell" aria-labelledby="task-title">
         <header className="task-header">
           <div className="task-title-block">
-            <p className="task-eyebrow">
+            <Chip className="task-eyebrow" size="sm" variant="soft">
               Daily organizer
-            </p>
+            </Chip>
             <h1 id="task-title">
               Task List
             </h1>
           </div>
 
-          {isAuthenticated && (
-            <div className="task-session-bar">
-              <span>
-                {session.user?.name ?? session.user?.email}
-              </span>
-              <button
-                className="task-secondary-button"
-                type="button"
-                onClick={() => signOut()}
+          <div className="task-session-bar">
+            <ThemeSwitch />
+            {isAuthenticated && (
+              <>
+                <span>
+                  {session.user?.name ?? session.user?.email}
+                </span>
+                <Button
+                  className="task-secondary-button"
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => signOut()}
               >
                 Cerrar Sesion
-              </button>
-            </div>
-          )}
+                </Button>
+              </>
+            )}
+          </div>
         </header>
 
         {status === "loading" && (
-          <p className="task-loading">
-            Loading your session...
-          </p>
+          <div className="task-loading">
+            <Spinner size="sm" />
+            <span>Loading your session...</span>
+          </div>
         )}
 
         {status === "unauthenticated" && (
-          <section
+          <HeroCard
             className="auth-panel"
             aria-label="Authentication"
           >
@@ -134,28 +148,31 @@ export default function Home() {
                 height={68}
               />
             </div>
-            <input
+            <HeroInput
               aria-label="Name"
               placeholder="Nombre"
               value={authName}
+              variant="secondary"
               onChange={(event) => {
                 setAuthName(event.target.value);
               }}
             />
-            <input
+            <HeroInput
               aria-label="Email"
               placeholder="Correo"
               type="email"
               value={authEmail}
+              variant="secondary"
               onChange={(event) => {
                 setAuthEmail(event.target.value);
               }}
             />
-            <input
+            <HeroInput
               aria-label="Password"
               placeholder="Contrasena"
               type="password"
               value={authPassword}
+              variant="secondary"
               onChange={(event) => {
                 setAuthPassword(event.target.value);
               }}
@@ -173,51 +190,54 @@ export default function Home() {
             )}
 
             <div className="auth-actions">
-              <button
+              <Button
                 type="button"
-                onClick={handleSignIn}
-                disabled={isAuthLoading}
+                variant="primary"
+                onPress={handleSignIn}
+                isDisabled={isAuthLoading}
               >
                 Iniciar Sesion
-              </button>
-              <button
+              </Button>
+              <Button
                 className="task-secondary-button"
                 type="button"
-                onClick={handleRegister}
-                disabled={isAuthLoading}
+                variant="secondary"
+                onPress={handleRegister}
+                isDisabled={isAuthLoading}
               >
                 Crear Cuenta
-              </button>
+              </Button>
             </div>
-          </section>
+          </HeroCard>
         )}
 
         {isAuthenticated && (
           <>
             <section className="task-summary" aria-label="Task summary">
-              <div className="task-summary-item">
+              <HeroCard className="task-summary-item">
                 <span>Total</span>
                 <strong>{List.length}</strong>
-              </div>
-              <div className="task-summary-item is-pending">
+              </HeroCard>
+              <HeroCard className="task-summary-item is-pending">
                 <span>Pendientes</span>
                 <strong>{pendingTasks}</strong>
-              </div>
-              <div className="task-summary-item is-active">
+              </HeroCard>
+              <HeroCard className="task-summary-item is-active">
                 <span>Activas</span>
                 <strong>{activeTasks}</strong>
-              </div>
-              <div className="task-summary-item is-done">
+              </HeroCard>
+              <HeroCard className="task-summary-item is-done">
                 <span>Listas</span>
                 <strong>{doneTasks}</strong>
-              </div>
+              </HeroCard>
             </section>
 
             <div className="task-input-bar">
-              <input
+              <HeroInput
                 aria-label="New task"
                 placeholder="Nueva tarea..."
                 value={Input}
+                variant="secondary"
                 onChange={(event) => {
                   setInput(event.target.value);
                 }}
@@ -229,12 +249,13 @@ export default function Home() {
 
                 }}
               />
-              <button
+              <Button
                 className="task-add-button"
-                onClick={addTask}
+                variant="primary"
+                onPress={addTask}
               >
                 Agregar
-              </button>
+              </Button>
 
             </div>
 
@@ -247,9 +268,9 @@ export default function Home() {
                 <>
 
                   {List.length === 0 && (
-                    <p className="task-empty">
+                    <HeroCard className="task-empty">
                       Todavia no tienes tareas.
-                    </p>
+                    </HeroCard>
                   )}
 
                   {List.map((task) => {
@@ -264,6 +285,7 @@ export default function Home() {
                         _id={task._id}
                         handleStartButton={changeTaskState}
                         handleEditTitle={editTaskTitle}
+                        commentHref={`/tasks/${task._id}`}
                       />
                     );
 
@@ -272,9 +294,10 @@ export default function Home() {
                 </>
               ) : (
 
-                <p className="task-loading">
-                  Loading your tasks...
-                </p>
+                <div className="task-loading">
+                  <Spinner size="sm" />
+                  <span>Loading your tasks...</span>
+                </div>
 
               )}
 

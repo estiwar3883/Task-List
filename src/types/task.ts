@@ -5,4 +5,5 @@ export interface Task {
   startedAt: number | null;
   totalTime: number;
   state: "pending" | "inProgress" | "done";
+  comments?: string[];
 }

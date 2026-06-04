@@ -1,6 +1,13 @@
 "use client";
 
+import {
+    Button,
+    Card as HeroCard,
+    Chip,
+    Input,
+} from "@heroui/react";
 import { useState } from "react";
+import Link from "next/link";
 import type { CardProps } from "../types/cardprops";
 import {stateText,buttonText} from "../constants/appConstants";
 
@@ -12,6 +19,7 @@ export const Card = ({
     _id,
     handleStartButton,
     handleEditTitle,
+    commentHref,
 }: CardProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState(title);
@@ -45,12 +53,19 @@ export const Card = ({
     };
 
     return (
-        <article className={`card2 ${state}`}>
+        <HeroCard className={`card2 ${state}`}>
+            {commentHref ? (
+                <Link
+                    href={commentHref}
+                    className="card-comment-link"
+                    aria-label={`Abrir comentarios de ${title}`}
+                />
+            ) : null}
             <div className="card-content">
                 <div className="card-header">
                     <div className="card-title-row">
                         {isEditing ? (
-                            <input
+                            <Input
                                 className="card-title-input"
                                 aria-label="Edit task title"
                                 value={editedTitle}
@@ -73,11 +88,13 @@ export const Card = ({
                             <h2>{title}</h2>
                         )}
 
-                        <button
+                        <Button
                             className="card-title-edit"
                             aria-label={isEditing ? "Save task title" : "Edit task title"}
                             type="button"
-                            onClick={() => {
+                            isIconOnly
+                            variant="ghost"
+                            onPress={() => {
                                 if (isEditing) {
                                     saveTitle();
                                     return;
@@ -103,12 +120,12 @@ export const Card = ({
                                     <path d="m14 6 4 4" />
                                 </svg>
                             )}
-                        </button>
+                        </Button>
                     </div>
 
-                    <span className="card-status">
+                    <Chip className={`card-status ${state}`} size="sm" variant="soft">
                         {stateText[state]}
-                    </span>
+                    </Chip>
                 </div>
 
                 <div className="card-info">
@@ -123,12 +140,16 @@ export const Card = ({
 
                 </div>
             </div>
-            <button
-                className="card-action"
-                onClick={() => handleStartButton(_id)}
-            >
-                {buttonText[state]}
-            </button>
-        </article>
+            <div className="card-actions-row">
+                <Button
+                    className="card-action"
+                    type="button"
+                    variant={state === "done" ? "danger-soft" : "primary"}
+                    onPress={() => handleStartButton(_id)}
+                >
+                    {buttonText[state]}
+                </Button>
+            </div>
+        </HeroCard>
     );
 };

@@ -33,6 +33,11 @@ const TaskSchema = new Schema({
     enum: ["pending", "inProgress", "done"],
     default: "pending",
   },
+
+  comments: {
+    type: [String],
+    default: [],
+  },
 });
 
 export const Task = mongoose.models.Task || mongoose.model("Task", TaskSchema);

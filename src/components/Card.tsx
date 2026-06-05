@@ -1,26 +1,12 @@
 "use client";
 
-import {
-    Button,
-    Card as HeroCard,
-    Chip,
-    Input,
-} from "@heroui/react";
+import {Button,Card as HeroCard,Chip,Input,} from "@heroui/react";
 import { useState } from "react";
 import Link from "next/link";
 import type { CardProps } from "../types/cardprops";
 import {stateText,buttonText} from "../constants/appConstants";
 
-export const Card = ({
-    title,
-    date,
-    state,
-    time,
-    _id,
-    handleStartButton,
-    handleEditTitle,
-    commentHref,
-}: CardProps) => {
+export const Card = ({title,date,state,time,_id,handleStartButton,handleEditTitle,commentHref,}: CardProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState(title);
 

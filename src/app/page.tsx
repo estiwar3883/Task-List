@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Button,
-  Card as HeroCard,
-  Chip,
-  Input as HeroInput,
-  Spinner,
-} from "@heroui/react";
+import {Button,Card as HeroCard,Chip,Input as HeroInput,Spinner,} from "@heroui/react";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -23,15 +17,7 @@ export default function Home() {
   const [authError, setAuthError] = useState("");
   const [isAuthLoading, setIsAuthLoading] = useState(false);
 
-  const {
-    Input,
-    setInput,
-    List,
-    addTask,
-    changeTaskState,
-    editTaskTitle,
-    getCurrentTime,
-  } = useTasks(isAuthenticated);
+  const {Input,setInput,List,addTask,changeTaskState,editTaskTitle,getCurrentTime,} = useTasks(isAuthenticated);
 
   const pendingTasks = List.filter((task) => task.state === "pending").length;
   const activeTasks = List.filter((task) => task.state === "inProgress").length;
@@ -40,13 +26,10 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-
     const frameId = requestAnimationFrame(() => {
       setIsMounted(true);
     });
-
     return () => cancelAnimationFrame(frameId);
-
   }, []);
 
   const handleSignIn = async () => {

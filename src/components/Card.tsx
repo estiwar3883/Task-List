@@ -4,9 +4,10 @@ import {Button,Card as HeroCard,Chip,Input,} from "@heroui/react";
 import { useState } from "react";
 import Link from "next/link";
 import type { CardProps } from "../types/cardprops";
-import {stateText,buttonText} from "../constants/appConstants";
+import { useTranslation } from "@/context/i18nContext";
 
-export const Card = ({title,date,state,time,_id,handleStartButton,handleEditTitle,commentHref,}: CardProps) => {
+export const Card = ({title,date,state,time,_id,commentCount,handleStartButton,handleEditTitle,commentHref,}: CardProps) => {
+    const { t } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState(title);
 
@@ -44,7 +45,7 @@ export const Card = ({title,date,state,time,_id,handleStartButton,handleEditTitl
                 <Link
                     href={commentHref}
                     className="card-comment-link"
-                    aria-label={`Abrir comentarios de ${title}`}
+                    aria-label={`${t.card.openComments} ${title}`}
                 />
             ) : null}
             <div className="card-content">
@@ -53,7 +54,7 @@ export const Card = ({title,date,state,time,_id,handleStartButton,handleEditTitl
                         {isEditing ? (
                             <Input
                                 className="card-title-input"
-                                aria-label="Edit task title"
+                                aria-label={t.card.editTitle}
                                 value={editedTitle}
                                 autoFocus
                                 onChange={(event) => {
@@ -76,7 +77,7 @@ export const Card = ({title,date,state,time,_id,handleStartButton,handleEditTitl
 
                         <Button
                             className="card-title-edit"
-                            aria-label={isEditing ? "Save task title" : "Edit task title"}
+                            aria-label={isEditing ? t.card.saveTitle : t.card.editTitle}
                             type="button"
                             isIconOnly
                             variant="ghost"
@@ -110,19 +111,23 @@ export const Card = ({title,date,state,time,_id,handleStartButton,handleEditTitl
                     </div>
 
                     <Chip className={`card-status ${state}`} size="sm" variant="soft">
-                        {stateText[state]}
+                        {t.card.state[state]}
                     </Chip>
                 </div>
 
                 <div className="card-info">
 
                     <span>
-                        {date || "No date recorded"}
+                        {date || t.card.noDate}
                     </span>
 
                     <strong>
                         {formatTime(time)}
                     </strong>
+
+                    <span className="card-comments-count">
+                        {commentCount} {commentCount === 1 ? t.card.commentsSingular : t.card.commentsPlural}
+                    </span>
 
                 </div>
             </div>
@@ -133,7 +138,7 @@ export const Card = ({title,date,state,time,_id,handleStartButton,handleEditTitl
                     variant={state === "done" ? "danger-soft" : "primary"}
                     onPress={() => handleStartButton(_id)}
                 >
-                    {buttonText[state]}
+                    {t.card.button[state]}
                 </Button>
             </div>
         </HeroCard>

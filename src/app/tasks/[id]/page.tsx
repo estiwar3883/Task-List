@@ -3,7 +3,9 @@
 import {Button,Card,Chip,Spinner,TextArea,} from "@heroui/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
+import { useTranslation } from "@/context/i18nContext";
 
 type Task = {
   _id: string;
@@ -15,13 +17,8 @@ type Task = {
   comments?: string[];
 };
 
-const stateLabel = {
-  pending: "Pendiente",
-  inProgress: "En progreso",
-  done: "Lista",
-};
-
 const TaskCommentsPage = () => {
+  const { t } = useTranslation();
   const params = useParams() as { id?: string };
   const router = useRouter();
   const taskId = params?.id;
@@ -41,7 +38,7 @@ const TaskCommentsPage = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("No se encontró la tarea.");
+          throw new Error(t.comments.taskNotFound);
         }
         return response.json();
       })
@@ -51,14 +48,14 @@ const TaskCommentsPage = () => {
       })
       .catch((fetchError) => {
         if (fetchError.name === "AbortError") return;
-        setError(fetchError.message || "No se pudo cargar la tarea.");
+        setError(fetchError.message || t.comments.taskLoadError);
         setStatus("error");
       });
 
     return () => {
       controller.abort();
     };
-  }, [taskId]);
+  }, [taskId, t.comments.taskLoadError, t.comments.taskNotFound]);
 
   const handleAddComment = async () => {
     if (!task || !comment.trim()) return;
@@ -75,7 +72,7 @@ const TaskCommentsPage = () => {
     });
 
     if (!response.ok) {
-      setError("No se pudo guardar el comentario.");
+      setError(t.comments.saveError);
       setStatus("ready");
       return;
     }
@@ -98,32 +95,33 @@ const TaskCommentsPage = () => {
               variant="secondary"
               onPress={() => router.push("/")}
             >
-              Volver a tareas
+              {t.comments.navBack}
             </Button>
             <ThemeSwitch />
+            <LanguageSwitch />
           </div>
           <div>
             <Chip className="task-eyebrow" size="sm" variant="soft">
-              Comentarios
+              {t.comments.eyebrow}
             </Chip>
-            <h1>Detalle de tarea</h1>
+            <h1>{t.comments.title}</h1>
           </div>
         </header>
 
         {isMissingTaskId && (
-          <Card className="task-error">No se entrego el ID de la tarea.</Card>
+          <Card className="task-error">{t.comments.missingTask}</Card>
         )}
 
         {!isMissingTaskId && status === "loading" && (
           <div className="task-loading">
             <Spinner size="sm" />
-            <span>Cargando tarea...</span>
+            <span>{t.comments.loadingTask}</span>
           </div>
         )}
 
         {!isMissingTaskId && status === "error" && (
           <Card className="task-error">
-            {error || "Error al cargar la tarea."}
+            {error || t.comments.errorLoading}
           </Card>
         )}
 
@@ -131,20 +129,22 @@ const TaskCommentsPage = () => {
           <Card className="task-comments-card">
             <div className="task-comments-summary">
               <div>
-                <span className="task-comments-label">Tarea</span>
+                <span className="task-comments-label">{t.comments.taskLabel}</span>
                 <h2>{task.title}</h2>
               </div>
               <div className="task-comments-meta">
                 <Chip className={`card-status ${task.state}`} size="sm" variant="soft">
-                  {stateLabel[task.state]}
+                  {t.card.state[task.state]}
                 </Chip>
-                <span>{task.date || "Fecha no registrada"}</span>
-                <strong>{comments.length} comentarios</strong>
+                <span>{task.date || t.comments.noDate}</span>
+                <strong>
+                  {comments.length} {comments.length === 1 ? t.card.commentsSingular : t.card.commentsPlural}
+                </strong>
               </div>
             </div>
 
             <div className="task-comments-list">
-              <h3>Comentarios</h3>
+              <h3>{t.comments.commentsTitle}</h3>
               {comments.length > 0 ? (
                 <ul>
                   {comments.map((text, index) => (
@@ -158,20 +158,20 @@ const TaskCommentsPage = () => {
                 </ul>
               ) : (
                 <Card className="task-comments-empty">
-                  No hay comentarios para esta tarea aun.
+                  {t.comments.empty}
                 </Card>
               )}
             </div>
 
             <div className="task-comments-form">
-              <label htmlFor="comment-input">Nuevo comentario</label>
+              <label htmlFor="comment-input">{t.comments.newComment}</label>
               <TextArea
                 id="comment-input"
                 value={comment}
                 variant="secondary"
                 onChange={(event) => setComment(event.target.value)}
                 rows={4}
-                placeholder="Escribe tu comentario aquí..."
+                placeholder={t.comments.placeholder}
               />
               <Button
                 type="button"
@@ -179,7 +179,7 @@ const TaskCommentsPage = () => {
                 onPress={handleAddComment}
                 isDisabled={!comment.trim() || status === "saving"}
               >
-                {status === "saving" ? "Guardando..." : "Guardar comentario"}
+                {status === "saving" ? t.comments.saving : t.comments.save}
               </Button>
             </div>
           </Card>

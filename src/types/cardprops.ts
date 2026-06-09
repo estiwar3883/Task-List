@@ -4,6 +4,7 @@ export interface CardProps {
   state: "pending" | "inProgress" | "done";
   time: number;
   _id: string;
+  commentCount: number;
   handleStartButton: (_id: string) => void;
   handleEditTitle: (_id: string, title: string) => Promise<void>;
   commentHref?: string;

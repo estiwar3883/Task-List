@@ -28,6 +28,7 @@ export async function GET() {
     totalTime: task.totalTime ?? 0,
     startedAt: task.startedAt ?? null,
     date: task.date ?? "",
+    comments: task.comments ?? [],
   }));
 
   return NextResponse.json(normalizedTasks);
@@ -59,6 +60,7 @@ export async function POST(req: Request) {
     totalTime: body.totalTime ?? 0,
     startedAt: body.startedAt ?? null,
     date: body.date ?? "",
+    comments: body.comments ?? [],
   });
 
   return NextResponse.json(newTask);

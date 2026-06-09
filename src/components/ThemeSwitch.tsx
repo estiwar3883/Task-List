@@ -3,6 +3,7 @@
 import { Moon, Sun } from "@gravity-ui/icons";
 import { Switch } from "@heroui/react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/context/i18nContext";
 
 type ThemeMode = "light" | "dark";
 
@@ -31,6 +32,7 @@ const applyTheme = (theme: ThemeMode) => {
 };
 
 export const ThemeSwitch = () => {
+  const { t } = useTranslation();
   const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
   const isDark = theme === "dark";
 
@@ -49,7 +51,7 @@ export const ThemeSwitch = () => {
         setTheme(nextTheme);
       }}
       className="theme-switch"
-      aria-label="Cambiar entre modo claro y oscuro"
+      aria-label={t.common.themeToggle}
     >
       {({ isSelected }) => (
         <Switch.Control>
